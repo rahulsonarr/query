@@ -1,0 +1,24 @@
+let
+    // Define a function to fetch data from a single page
+    GetPageData = (page) =>
+        let
+            Source = Web.Page(Web.Contents("https://www.screener.in/screens/71064/all-stocks/?page=" & Text.From(page))),
+            Data = Source{0}[Data],
+            #"Changed Type" = Table.TransformColumnTypes(Data, {
+                {"S.No.", Int64.Type}, {"Name", type text}, {"CMP Rs.", type number},
+                {"P/E", type number}, {"Mar Cap Rs.Cr.", type number}, {"Div Yld %", type number},
+                {"NP Qtr Rs.Cr.", type number}, {"Qtr Profit Var %", type number},
+                {"Sales Qtr Rs.Cr.", type number}, {"Qtr Sales Var %", type number}, {"ROCE %", type number}
+            })
+        in
+            #"Changed Type",
+    
+    // Fetch data from multiple pages and append them
+    Page3Data = GetPageData(3),
+    Page4Data = GetPageData(4),
+    Page5Data = GetPageData(5),
+    
+    // Append tables
+    AppendedData = Table.Combine({Page3Data, Page4Data, Page5Data})
+in
+    AppendedData
